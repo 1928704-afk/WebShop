@@ -20,7 +20,7 @@ const BASE_URL = __ENV.BASE_URL || 'http://localhost:8080';
 
 export default function () {
   // 1. 상품 목록 조회 (페이징 & 카테고리 필터)
-  const listRes = http.get(`${BASE_URL}/api/products?category=전자제품&page=0&size=12`);
+  const listRes = http.get(`${BASE_URL}/api/products?category=ELECTRONICS&page=0&size=12`);
   check(listRes, {
     '상품 목록 응답 성공 (200 OK)': (r) => r.status === 200,
     '목록 응답 시간 150ms 이내': (r) => r.timings.duration < 150,

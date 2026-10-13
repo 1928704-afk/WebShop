@@ -6,7 +6,7 @@ spring:
     name: product-service
 
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/product_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3307}/product_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
     username: ${DB_USER:shopuser}
     password: ${DB_PASSWORD:shoppassword}
     driver-class-name: com.mysql.cj.jdbc.Driver

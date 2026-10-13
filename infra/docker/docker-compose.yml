@@ -11,7 +11,7 @@ services:
       MYSQL_USER: shopuser
       MYSQL_PASSWORD: shoppassword
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - ./mysql/init:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
