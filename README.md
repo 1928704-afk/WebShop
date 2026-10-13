@@ -132,7 +132,43 @@ npm run dev
 
 ---
 
-## ☸️ 5. Kubernetes (k8s) 프로덕션 배포
+## 🧪 5. E2E API 테스트 (Postman) & 대용량 부하/성능 테스트 (k6)
+
+본 프로젝트는 마이크로서비스 간 비즈니스 정합성 검증(Postman)과 대규모 동시 트래픽 환경에서의 성능/복원력 검증(k6)을 위한 테스트 스위트를 완비하고 있습니다.
+
+### 5.1 Postman E2E 시나리오 테스트
+전체 9단계 마이크로서비스 비즈니스 흐름(회원가입 ➔ 로그인/JWT 추출 ➔ 내 정보 ➔ 상품 등록 ➔ 목록/캐시 조회 ➔ 주문 접수/SAGA ➔ 결제 검증)을 순차 검증합니다:
+
+```bash
+# Newman CLI를 통한 자동화 E2E 테스트 실행
+npm install -g newman # 최초 1회
+newman run tests/postman/newshop-api-collection.json \
+  -e tests/postman/newshop-environment.json
+```
+
+### 5.2 k6 대용량 부하/성능 테스트 (Load Testing)
+
+#### ① 상품 조회 및 Redis 캐시 부하 테스트 (`product-read-load-test.js`)
+가상 사용자(VUs) 50명이 상품 목록 및 상세 조회를 지속적으로 요청할 때, **Redis 캐시의 응답 시간 최적화 및 안정성**을 검증합니다:
+```bash
+k6 run tests/k6/product-read-load-test.js
+```
+- **성능 임계치 (Thresholds)**:
+  - `http_req_duration`: `p(95) < 200ms` (95%의 요청이 200ms 이내에 처리되어야 성공)
+  - `http_req_failed`: `rate < 0.01` (에러율 1% 미만 유지)
+
+#### ② 동시 주문 생성 및 Kafka SAGA 스트레스 테스트 (`order-saga-stress-test.js`)
+동시에 30명의 사용자가 결제/주문을 접수할 때, **Kafka 메시지 브로커의 비동기 처리량과 SAGA 트랜잭션 수용력**을 검증합니다:
+```bash
+k6 run tests/k6/order-saga-stress-test.js
+```
+- **성능 임계치 (Thresholds)**:
+  - `http_req_duration`: `p(95) < 400ms` (비동기 이벤트 발행 지연 400ms 이내)
+  - `http_req_failed`: `rate < 0.05` (에러율 5% 미만 유지)
+
+---
+
+## ☸️ 6. Kubernetes (k8s) 프로덕션 배포
 
 `infra/k8s` 디렉터리에 정의된 매니페스트를 적용하여 쿠버네티스 클러스터에 배포할 수 있습니다:
 ```bash
@@ -146,7 +182,7 @@ kubectl apply -f infra/k8s/
 
 ---
 
-## 📁 6. 디렉터리 구조
+## 📁 7. 디렉터리 구조
 
 ```text
 newShop/
@@ -167,6 +203,10 @@ newShop/
 ├── infra/
 │   ├── docker/               # 로컬 Docker Compose 인프라
 │   └── k8s/                  # 쿠버네티스 배포 매니페스트
+├── tests/
+│   ├── postman/              # Postman 컬렉션 & 환경 변수
+│   ├── k6/                   # k6 부하/스트레스 테스트 스크립트
+│   └── README.md             # 상세 테스트 실행 가이드
 ├── task.md                   # 단계별 진행 태스크 목록
 ├── implementation_plan.md    # 상세 구현 설계 문서
 └── README.md
