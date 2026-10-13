@@ -1,0 +1,8 @@
+rootProject.name = 'newshop-backend'
+
+include 'common'
+include 'api-gateway'
+include 'user-service'
+include 'product-service'
+include 'order-service'
+include 'payment-service'

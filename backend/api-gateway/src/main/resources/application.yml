@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        # 1. User Service 라우팅
+        - id: user-service
+          uri: ${USER_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/users/**
+
+        # 2. Product Service 라우팅
+        - id: product-service
+          uri: ${PRODUCT_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/products/**
+
+        # 3. Order Service 라우팅
+        - id: order-service
+          uri: ${ORDER_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/orders/**
+
+        # 4. Payment Service 라우팅
+        - id: payment-service
+          uri: ${PAYMENT_SERVICE_URL:http://localhost:8084}
+          predicates:
+            - Path=/api/payments/**
+
+jwt:
+  secret: shopSuperSecretKeyForJwtSigningMustBeVeryLong32Chars!
+  access-token-validity-ms: 3600000
+  refresh-token-validity-ms: 604800000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
